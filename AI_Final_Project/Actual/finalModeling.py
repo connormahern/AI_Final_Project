@@ -1,5 +1,6 @@
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
+import sklearn
 from geopy.geocoders import Nominatim
 import numpy as np
 import math
@@ -35,7 +36,8 @@ def countyFrame(CNTY) :
         'CNTY NAME' : CNTY['CTNY'],
         'AGE RANGE' : CNTY['AGE RANGE'],
         'TOT POP BY AGE GROUP' : CNTY['TPOP PA PCN'],
-        'CASES BY AGE GROUP' : CNTY['Number of Cases Per Age Range']
+        'CASES BY AGE GROUP' : CNTY['Number of Cases Per Age Range'],
+        'MOBILITY TOTAL' : CNTY['MOBILITY TOTAL']
     }
 
     df = pd.DataFrame(data)
@@ -78,7 +80,6 @@ print(cityProb)
 '''
 dfCities = pd.read_csv(sexDistData, usecols = ['city','state_id'])
 
-dfCities = dfCities.sample(n=25)
 
 frames = []
 
@@ -103,6 +104,20 @@ for elm in dfCities.iterrows():
         continue
 
 df2 = pd.concat(frames)
+normalize_mob = df2['MOBILITY TOTAL']
+print(type(normalize_mob))
+df2 = df2.drop(['MOBILITY TOTAL'], axis=1 )
+
+
+
+min_max_scaler = sklearn.preprocessing.MinMaxScaler()
+normalize_mob = normalize_mob.to_numpy()
+normalize_mob = normalize_mob.reshape(-1, 1)
+mob_scaled = min_max_scaler.fit_transform(normalize_mob)
+
+mob_scaled = pd.DataFrame(mob_scaled)
+
+df2 = df2.join(mob_scaled)
 
 ids = df2[['CNTY NAME', 'AGE RANGE']]
 y = df2['IsOutbreak']
@@ -149,6 +164,7 @@ print(outbreak_prob)
 
 # result = pd.concat([df2, outbreak_prob], axis=1, sort=False)
 result = df2.join(outbreak_prob)
+result.to_csv('results1l.csv',index= True)
 print(result)
 
 

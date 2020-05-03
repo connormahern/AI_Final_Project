@@ -3,7 +3,7 @@ path = '/Users/connormahern/Desktop/AI_Final_Project/'
 
 censusData = path + 'AI_FinalProject/censusData.csv'
 ageSexData = path + 'AI_FinalProject/ageSexData.csv'
-mobilityData = path + 'AI_FinalProject/google_mobility_data.csv'
+#mobilityData = path + 'AI_FinalProject/google_mobility_data.csv'
 popDensityData = path + 'AI_FinalProject/popDensityState.csv'
 sexDistData = path + 'AI_FinalProject/output.csv'
 
@@ -103,6 +103,20 @@ def prob(cityObj):
     # get string name
     strngName = cityObj.place.split(", ")
 
+    mobilityData = ('https://raw.githubusercontent.com/ActiveConclusion/COVID19_mobility/master/google_reports/mobility_report_US.csv')
+    dfMobility = pd.read_csv(mobilityData)
+    dfMobility['date'] = pd.to_datetime(dfMobility['date'])
+    dfMobility.fillna(0, inplace=True)
+    try:
+        df3 = dfMobility[dfMobility['state'].str.contains(locationName[1]) & dfMobility['county'].str.contains(locationName[0])]
+        total = df3.tail(n=7)
+        total = total.sum(axis=1, skipna=True)
+        mobilityTotal = total.mean(axis=0)
+        print('try', mobilityTotal)
+    except:
+        mobilityTotal = 0
+        pass
+
     # read sex by county and returns a male to female distribution
     dfSDist = pd.read_csv(sexDistData)
     df4 = dfSDist[dfSDist['STNAME'].str.contains(strngName[1]) & dfSDist['CTYNAME'].str.contains(strngName[0])]
@@ -110,7 +124,7 @@ def prob(cityObj):
     #Adding all columns
     tot_pop = df4['TOT_POP']
     tot_pop = tot_pop[tot_pop.idxmax()]
-    
+
     #MEAN DISTRIBUTION OF AGE BY COUNTY
     age_groups = ['Total', '0:4', '5:9',  '10:14', '15:19',  '20:24', '25:29', '30:34', '35:39', '40:44', '45:49', '50:54', '55:59', '60:64', '65:69', '70:74', '75:79', '80:84', '85+']
     age_tot = []
@@ -131,11 +145,11 @@ def prob(cityObj):
         ageG_cases.append(math.floor(row * casesP))
 
 
-    return {'CTNY' : cityObj.place, 'STN' : cityObj.state, 'TOT POP': tot_pop, 'TOT CASES': cityObj.cases, 'AGE RANGE' : age_groups, 'TPOP PA PCN' : age_tot, 'PRECENT OF POP INFECTED' : casesP, 'Number of Cases Per Age Range' : ageG_cases}
+    return {'CTNY' : cityObj.place, 'STN' : cityObj.state, 'TOT POP': tot_pop, 'TOT CASES': cityObj.cases, 'AGE RANGE' : age_groups, 'TPOP PA PCN' : age_tot, 'PRECENT OF POP INFECTED' : casesP, 'Number of Cases Per Age Range' : ageG_cases, 'MOBILITY TOTAL' : mobilityTotal}
 
 
 
-    
+
 
 
 
