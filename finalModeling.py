@@ -83,7 +83,10 @@ model.fit(x, y)
 outbreak_prob = pd.DataFrame(model.predict_proba(x), columns=['Prob Not Outbreak', 'Predicted Prob Outbreak']) 
 traing_result = ids_training.join(outbreak_prob)
 #print(traing_result)
-print(accuracy_score(y, traing_result))
+
+#This is our accary score
+y_hat = pd.Series(model.predict(x), name='Pred IsOutbreak') 
+print("Accuracy Score : " + str(accuracy_score(y, y_hat)))
 
 #TESTING DATA OR Y_HAT
 ids_testing = testing_data[['CNTY NAME', 'AGE RANGE', 'PRECENT CASES BY AGE GROUP', 'Mobility Total']]
