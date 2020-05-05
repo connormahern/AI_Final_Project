@@ -29,7 +29,7 @@ def countyFrame(CNTY) :
     df['PRECENT CASES BY AGE GROUP'] = (df['CASES BY AGE GROUP'] / df['TOT POP BY AGE GROUP'])*100
 
     #OUTBREAK THRESHOLD - can be described as 1 / Log(R0) -- R0 is the Basic Repoduction number, i.e. the number of people infected by one case
-    #R0 number as of April 7, 2020 reported as 2.2 - 2.7 (2.4)
+    #R0 number as of April 7, 2020 reported as 5.7
     outbreak_threshold = 1 / (math.log(5.7))
     df['IsOutbreak'] = df['PRECENT CASES BY AGE GROUP'] >= outbreak_threshold
 
